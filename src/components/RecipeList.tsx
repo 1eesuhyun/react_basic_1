@@ -1,32 +1,23 @@
 import {useState, useEffect} from "react";
-import axios from "axios";
-
-interface Food {
-    fno: number;
-    name: string;
-    poster: string;
-}
-
-interface FoodListProps {
-    list: Food[];
-    curpage: number;
-    totalpage: number;
-    startPage: number;
-    endPage: number;
-}
-
-// useEffect() = rendering = setXxx() = return을 찾아서 render
-
-function FoodList() {
+import axios, {AxiosResponse} from "axios";
+import {Recipe, RecipeProps} from "../types";
+/*
+    필요한 interface / axios(공통으로 사용)
+    ------------------------------------
+    | tanStackQuery
+    | bootstrap
+ */
+function RecipeList() {
     const [curpage, setCurpage] = useState<number>(1);
-    const [data, setData] = useState<FoodListProps>();
+    const [data, setData] = useState<RecipeProps>();
+
     useEffect(() => {
-        axios.get(`http://localhost:/food/list_react/${curpage}`)
-            .then(res => {
+        axios.get(`http://localhost/recipe/list_react/${curpage}`)
+            .then((res: AxiosResponse<any>) => {
                 console.log(res.data);
                 setData(res.data);
             })
-    }, [curpage]) // 재호출 [] : mounted() [변수] => 재호출
+    }, [curpage]);
     const prev: () => void = (): void => {
         if (data) {
             setCurpage(data.startPage - 1)
@@ -58,28 +49,13 @@ function FoodList() {
             <li><a className={"nav-link"} onClick={next}>&raquo;</a></li>
         )
     }
-    // HTML이 아니고 XML => 파싱해서 HTML로 변경 (render) => index.html <div id="root">변경된 HTML첨부</div>
-    /*
-        함수 호출 => (<함수명>) : html과 구분 => 첫 글자는 대문자로
-        => 단방향
-
-        요구사항
-            back : springFramework / spring-boot / database(oracle,mysql)
-                   orm(jpa, mybatis)
-                   view(jsp, thymeleaf)
-
-                   websocket / security(jwt)
-            front : javascript, vue / react = typescript, nodejs
-                    -----------------------
-            기타 : AWS / Docker
-     */
-    const html: any = data?.list.map((food: Food) =>
+    const html: any = data?.list.map((recipe: Recipe) =>
         <div className="col-md-3">
             <div className="thumbnail">
                 <a href="#">
-                    <img src={food.poster} style={{"width": "240px", "height": "200px"}}/>
+                    <img src={recipe.poster} style={{"width": "240px", "height": "200px"}} title={recipe.title}/>
                     <div className="caption">
-                        <div className={"p"}>{food.name}</div>
+                        <div className={"p"}>{recipe.chef}</div>
                     </div>
                 </a>
             </div>
@@ -99,4 +75,4 @@ function FoodList() {
     )
 }
 
-export default FoodList;
+export default RecipeList;
